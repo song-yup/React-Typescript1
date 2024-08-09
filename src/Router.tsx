@@ -8,7 +8,7 @@ interface IRouterProps {
 }
 
 function Router() {
-    return <BrowserRouter>
+    return <BrowserRouter basename={process.env.PUBLIC_URL}>
         <Switch>
             <Route path="/:coinId">
                 <Coin/>
