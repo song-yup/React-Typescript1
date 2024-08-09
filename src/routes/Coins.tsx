@@ -52,8 +52,8 @@ const Loader = styled.span`
 `;
 
 const Img = styled.img`
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     margin-right: 10px;
 `;
 
@@ -69,8 +69,13 @@ interface ICoinInterface {
 
 function Coins( ) {
     const setDarkAtom = useSetRecoilState(isDarkAtom);
-    const toggleDarkAtom = () => setDarkAtom((current) => !current);
+    const toggleDarkAtom = () => {
+        setDarkAtom((current) => !current);
+        setIsDark((current) => !current);
+    };
     const { isLoading, data } = useQuery<ICoinInterface[]>("allCoins", fetchCoins);
+    const [isDark, setIsDark] = useState(false);
+
     // const [coins, setCoins] = useState<CoinInterface[]>([]);
     // const [loading, setLoading] = useState(true);
     
@@ -90,7 +95,10 @@ function Coins( ) {
             </Helmet>
             <Header>
                 <Title>코인</Title>
-                <button onClick={toggleDarkAtom}>Toggle Mode</button>
+                {isDark ? 
+                <Img src="https://cdn-icons-png.flaticon.com/512/6360/6360844.png" onClick={toggleDarkAtom}></Img> : 
+                <Img src="https://cdn-icons-png.flaticon.com/512/6714/6714978.png" onClick={toggleDarkAtom}></Img>
+                }
             </Header>
             {isLoading ? (
                 <Loader>"Loading..."</Loader>

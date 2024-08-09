@@ -6,6 +6,8 @@ import Chart from "./Chart";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
 import { Helmet } from "react-helmet";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
     padding: 0px 20px;
@@ -74,6 +76,17 @@ const Tab = styled.span<{ isActive:boolean }>`
     a {
         display: block;
     }
+`;
+
+const Img = styled.img`
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+`;
+
+const Home = styled.div`
+    align-items: center;
+    margin-left: 200px;
 `;
 
 interface RouteParams {
@@ -153,6 +166,12 @@ function Coin() {
         () => fetchCoinTickers(coinId), 
         // {refetchInterval: 100000}
     );
+    const setDarkAtom = useSetRecoilState(isDarkAtom);
+    const toggleDarkAtom = () => {
+        setDarkAtom((current) => !current);
+        setIsDark((current) => !current);
+    };
+    const [isDark, setIsDark] = useState(false);
 
     // useEffect(() => {
     //     (async () => {
@@ -174,8 +193,15 @@ function Coin() {
     return (
         <Container>
             <Helmet><title>{state?.name ? state.name : loading ? "Loading..." :  infoData?.name}</title></Helmet>
-            <Header>
+            <Home>
+                <Link to={`/`}><Img src="https://cdn-icons-png.flaticon.com/512/7781/7781465.png" /></Link>                
+            </Home>
+            <Header>    
                 <Title>{state?.name ? state.name : loading ? "Loading..." :  infoData?.name}</Title>
+                {isDark ? 
+                <Img src="https://cdn-icons-png.flaticon.com/512/6360/6360844.png" onClick={toggleDarkAtom}></Img> : 
+                <Img src="https://cdn-icons-png.flaticon.com/512/6714/6714978.png" onClick={toggleDarkAtom}></Img>
+                }
             </Header>
             {loading ? (
                 <Loader>"Loading..."</Loader>
@@ -192,7 +218,7 @@ function Coin() {
                         </OverviewItem>
                         <OverviewItem>
                             <span>price:</span>
-                            <span>{tickersData?.quotes.USD.price.toFixed(3)}</span>
+                            <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
                         </OverviewItem>
                     </Overview>
                     <Description>
@@ -218,7 +244,18 @@ function Coin() {
                     </Tabs>
                     <Switch>
                         <Route path={`/${coinId}/price`}>
-                            <Price />
+                        <Price 
+                            coinId={coinId}
+                            ath_price={tickersData?.quotes.USD.ath_price}
+                            ath_date={tickersData?.quotes.USD.ath_date}
+                            percent_change_30m={tickersData?.quotes.USD.percent_change_30m}
+                            percent_change_1h={tickersData?.quotes.USD.percent_change_1h}
+                            percent_change_24h={tickersData?.quotes.USD.percent_change_24h}
+                            percent_change_7d={tickersData?.quotes.USD.percent_change_7d}
+                            percent_change_30d={tickersData?.quotes.USD.percent_change_30d}
+                            percent_change_1y={tickersData?.quotes.USD.percent_change_1y}
+                            percent_from_price_ath={tickersData?.quotes.USD.percent_from_price_ath}               
+                        />
                         </Route>
                         <Route path={`/${coinId}/chart`}>
                             <Chart coinId={coinId} />
